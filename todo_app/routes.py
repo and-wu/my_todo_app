@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from starlette.requests import Request
 from typing import List
 
-from todo_app.database.repository.tasks import TaskCRUD
+from todo_app.database.repository.tasks import TaskRepository
 from .models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema
 router = APIRouter()
 
@@ -16,21 +16,21 @@ def hello_todo():
     }
 
 @router.get('/todos', response_model=List[ReadTodoItemSchema])
-def get_list_tasks(crud: TaskCRUD = Depends(get_crud)):
+def get_list_tasks(crud: TaskRepository = Depends(get_crud)):
     return crud.all_tasks()
 
 @router.post('/todos', response_model=TodoItem)
-def creat_task(task: CreatTodoItemSchema, crud: TaskCRUD = Depends(get_crud)):
-    new_task = crud.creat_task(task)
+def creat_task(task: CreatTodoItemSchema, crud: TaskRepository = Depends(get_crud)):
+    new_task = crud.create_task(task)
     return new_task
 
 @router.put("/todos/{id}", response_model=TodoItem)
-def update_task(id: int, updated_task: CreatTodoItemSchema, crud: TaskCRUD = Depends(get_crud)):
+def update_task(id: int, updated_task: CreatTodoItemSchema, crud: TaskRepository= Depends(get_crud)):
     new_task = crud.update_task(task_id=id, data=updated_task)
     return new_task
 
 @router.patch("/todos/{id}")
-def change_completed(id: int, crud: TaskCRUD = Depends(get_crud)):
+def change_completed(id: int, crud: TaskRepository = Depends(get_crud)):
     try:
         new_task = crud.change_completed(id)
         return new_task
@@ -41,7 +41,7 @@ def change_completed(id: int, crud: TaskCRUD = Depends(get_crud)):
 
 
 @router.delete('/todos/{id}')
-def delete_task(id: int, crud: TaskCRUD = Depends(get_crud)):
+def delete_task(id: int, crud: TaskRepository = Depends(get_crud)):
     try:
         crud.delete_task(id)
         return True
