@@ -1,0 +1,38 @@
+# 🐍 Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# 📦 Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# 🔐 Environment variables and secrets
+.env
+*.env
+
+# 📋 Logs
+*.log
+
+# 🗃️ SQLite databases
+*.sqlite3
+
+# 🧠 PyCharm project files
+.idea/
+
+# 🧪 Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 📦 Build artifacts (если вдруг собираешь)
+dist/
+build/
+*.egg-info/
+
+# 💻 OS-specific
+.DS_Store
+Thumbs.db
