@@ -21,7 +21,7 @@ def get_list_tasks(crud: TaskRepository = Depends(get_crud)):
 
 @router.post('/todos', response_model=TodoItem)
 def creat_task(task: CreatTodoItemSchema, crud: TaskRepository = Depends(get_crud)):
-    new_task = crud.creat_task(task)
+    new_task = crud.create_task(task)
     return new_task
 
 @router.put("/todos/{id}", response_model=TodoItem)
