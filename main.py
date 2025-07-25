@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from todo_app.database.repository.tasks import TaskCRUD
+from todo_app.database.repository.tasks import TaskRepository
 from todo_app.routes import router
 from todo_app.database.core import get_database
 
@@ -14,7 +14,7 @@ from todo_app.database.core import get_database
 async def lifespan(app: FastAPI):
     db = get_database(Path('todos.db'))
     db.create_tasks_table()
-    app.state.crud = TaskCRUD(database=db)
+    app.state.crud = TaskRepository(database=db)
     yield
 
 app = FastAPI(lifespan=lifespan, title="ToDo API with DB")
