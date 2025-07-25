@@ -30,8 +30,8 @@ class TaskRepository(BaseRepository):
 
     def update_task(self, task_id: int, data: CreatTodoItemSchema):
         self.update(task_id, data)
-        updated_data = data.model_dump(exclude_unset=True)
-        return TodoItem(id=task_id, **updated_data)
+        row = self.get_by_id(task_id)
+        return self._row_to_todo(row=row)
 
 
     def change_completed(self, task_id: int):
