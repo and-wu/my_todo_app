@@ -53,7 +53,8 @@ class TaskRepository(BaseRepository):
             title=task.title,
             description=task.description,
             completed=new_completed,
-            created_at=task.created_at
+            created_at=task.created_at,
+            priority=task.priority
         )
 
     def delete_task(self, task_id: int):
