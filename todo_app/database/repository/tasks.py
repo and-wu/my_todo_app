@@ -8,7 +8,13 @@ class TaskRepository(BaseRepository):
 
     @staticmethod
     def _row_to_todo(row):
-        return TodoItem(id=row[0], title=row[1], description=row[2], completed=bool(row[3]), created_at=row[4])
+        return TodoItem(id=row[0],
+                        title=row[1],
+                        description=row[2],
+                        completed=bool(row[3]),
+                        created_at=row[4],
+                        priority=(row[5])
+        )
 
     def all_tasks(self):
         rows = self.get_all()
@@ -16,7 +22,8 @@ class TaskRepository(BaseRepository):
                                    title=row[1],
                                    description=row[2],
                                    completed=bool(row[3]),
-                                   created_at=row[4]) for row in rows]
+                                   created_at=row[4],
+                                   priority = row[5]) for row in rows]
 
     def get_task(self, task_id: int):
         row = self.get_by_id(task_id)
