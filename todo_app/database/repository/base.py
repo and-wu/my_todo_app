@@ -41,6 +41,8 @@ class BaseRepository:
                 raise ValueError(f"Запись с id={row_id} не найдена.")
             return True
 
+
+
     def delete(self, row_id: int):
         with self.db.get_cursor() as cursor:
             cursor.execute(f"DELETE FROM {self.table} WHERE id = ?", (row_id,))

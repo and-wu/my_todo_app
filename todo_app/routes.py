@@ -3,7 +3,8 @@ from starlette.requests import Request
 from typing import List
 
 from todo_app.database.repository.tasks import TaskRepository
-from .models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema
+from .models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema, PriorityChangeSchema
+
 router = APIRouter()
 
 def get_crud(request: Request):
@@ -29,7 +30,7 @@ def update_task(id: int, updated_task: CreatTodoItemSchema, crud: TaskRepository
     new_task = crud.update_task(task_id=id, data=updated_task)
     return new_task
 
-@router.patch("/todos/{id}")
+@router.patch("/todos/{id}/change-completed")
 def change_completed(id: int, crud: TaskRepository = Depends(get_crud)):
     try:
         new_task = crud.change_completed(id)
@@ -39,6 +40,15 @@ def change_completed(id: int, crud: TaskRepository = Depends(get_crud)):
     except Exception:
         raise HTTPException(status_code=500, detail="Ошибка при удалении задачи")
 
+@router.patch("/todos/{id}/change-priority", response_model=TodoItem)
+def change_priority(id: int, data: PriorityChangeSchema, crud: TaskRepository = Depends(get_crud)):
+    try:
+        new_task = crud.change_priority(id, data.priority)
+        return new_task
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Ошибка при изменении приоритета задачи")
 
 @router.delete('/todos/{id}')
 def delete_task(id: int, crud: TaskRepository = Depends(get_crud)):

@@ -57,6 +57,23 @@ class TaskRepository(BaseRepository):
             priority=task.priority
         )
 
+    def change_priority(self, task_id: int, task_priority: int):
+        task = self.get_task(task_id)
+        new_priority = task_priority
+
+        with self.db.get_cursor() as cursor:
+            cursor.execute(f"UPDATE {self.table} SET priority = ? WHERE id = ?", (new_priority, task_id))
+
+        return TodoItem(
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            completed=task.completed,
+            created_at=task.created_at,
+            priority=new_priority
+        )
+
+
     def delete_task(self, task_id: int):
         self.delete(task_id)
 

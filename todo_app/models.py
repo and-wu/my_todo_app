@@ -4,6 +4,10 @@ from pydantic import BaseModel
 from datetime import datetime
 from .enums import Priority
 
+class PriorityChangeSchema(BaseModel):
+    priority: int
+
+
 class TodoItem(BaseModel):
     id: int
     title: str
