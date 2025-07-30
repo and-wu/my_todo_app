@@ -1,4 +1,4 @@
-from todo_app.models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema
+from todo_app.models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema, ChangeSchema
 from todo_app.database.core import DataBase
 from todo_app.database.repository.base import BaseRepository
 
@@ -34,12 +34,15 @@ class TaskRepository(BaseRepository):
         row = self.get_by_id(task_id)
         return self._row_to_todo(row=row)
 
-
     def update_task(self, task_id: int, data: CreatTodoItemSchema):
         self.update(task_id, data)
         row = self.get_by_id(task_id)
         return self._row_to_todo(row=row)
 
+    def change_task(self, task_id: int, data: ChangeSchema ):
+        self.change(task_id, data)
+        row = self.get_by_id(task_id)
+        return self._row_to_todo(row=row)
 
     def change_completed(self, task_id: int):
         task = self.get_task(task_id)
@@ -56,23 +59,6 @@ class TaskRepository(BaseRepository):
             created_at=task.created_at,
             priority=task.priority
         )
-
-    def change_priority(self, task_id: int, task_priority: int):
-        task = self.get_task(task_id)
-        new_priority = task_priority
-
-        with self.db.get_cursor() as cursor:
-            cursor.execute(f"UPDATE {self.table} SET priority = ? WHERE id = ?", (new_priority, task_id))
-
-        return TodoItem(
-            id=task.id,
-            title=task.title,
-            description=task.description,
-            completed=task.completed,
-            created_at=task.created_at,
-            priority=new_priority
-        )
-
 
     def delete_task(self, task_id: int):
         self.delete(task_id)

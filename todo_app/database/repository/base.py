@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from ..core import DataBase
+from ...models import ChangeSchema, TodoItem
 
 
 class BaseRepository:
@@ -41,6 +42,22 @@ class BaseRepository:
                 raise ValueError(f"Запись с id={row_id} не найдена.")
             return True
 
+    def change(self, row_id: int, changes: ChangeSchema):
+        fields = changes.model_dump(exclude_unset=True)
+        if not fields:
+            raise ValueError("Нет данных для обновления.")
+
+        columns = ", ".join(f"{key} = ?" for key in fields.keys())
+        values = list(fields.values())
+
+        with self.db.get_cursor() as cursor:
+            cursor.execute(
+                f"UPDATE {self.table} SET {columns} WHERE id = ?",
+                (*values, row_id)
+            )
+            if cursor.rowcount == 0:
+                raise ValueError(f"Задача с id={row_id} не найдена.")
+        return True
 
 
     def delete(self, row_id: int):
