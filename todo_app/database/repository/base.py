@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from ..core import DataBase
-from ...models import ChangeSchema, TodoItem
 
 
 class BaseRepository:
@@ -42,8 +41,8 @@ class BaseRepository:
                 raise ValueError(f"Запись с id={row_id} не найдена.")
             return True
 
-    def change(self, row_id: int, changes: ChangeSchema):
-        fields = changes.model_dump(exclude_unset=True)
+    def change(self, row_id: int, data: BaseModel):
+        fields = data.model_dump(exclude_unset=True)
         if not fields:
             raise ValueError("Нет данных для обновления.")
 

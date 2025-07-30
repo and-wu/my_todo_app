@@ -39,26 +39,10 @@ class TaskRepository(BaseRepository):
         row = self.get_by_id(task_id)
         return self._row_to_todo(row=row)
 
-    def change_task(self, task_id: int, data: ChangeSchema ):
+    def change_task(self, task_id: int, data: ChangeSchema):
         self.change(task_id, data)
         row = self.get_by_id(task_id)
         return self._row_to_todo(row=row)
-
-    def change_completed(self, task_id: int):
-        task = self.get_task(task_id)
-        new_completed = not task.completed
-
-        with self.db.get_cursor() as cursor:
-            cursor.execute(f"UPDATE {self.table} SET completed = ? WHERE id = ?", (int(new_completed), task_id))
-
-        return TodoItem(
-            id=task.id,
-            title=task.title,
-            description=task.description,
-            completed=new_completed,
-            created_at=task.created_at,
-            priority=task.priority
-        )
 
     def delete_task(self, task_id: int):
         self.delete(task_id)
