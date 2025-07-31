@@ -1,36 +1,40 @@
 from fastapi import APIRouter, HTTPException, Depends
 from starlette.requests import Request
-from typing import List
 
 from todo_app.database.repository.tasks import TaskRepository
 from .models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema, ChangeSchema
 router = APIRouter()
 
-def get_crud(request: Request):
+def get_crud(request: Request) -> TaskRepository:
     return request.app.state.crud
 
 @router.get('/')
-def hello_todo():
+def hello_todo() -> dict:
     return {
         'message': 'hello, this is my ToDo with DateBase'
     }
 
-@router.get('/todos', response_model=List[ReadTodoItemSchema])
-def get_list_tasks(crud: TaskRepository = Depends(get_crud)):
+@router.get('/todos', response_model=list[ReadTodoItemSchema])
+def get_list_tasks(crud: TaskRepository = Depends(get_crud)) -> list[tuple]:
     return crud.all_tasks()
 
 @router.post('/todos', response_model=TodoItem)
-def creat_task(task: CreatTodoItemSchema, crud: TaskRepository = Depends(get_crud)):
+def creat_task(task: CreatTodoItemSchema,
+               crud: TaskRepository = Depends(get_crud)) -> TodoItem:
     new_task = crud.create_task(task)
     return new_task
 
 @router.put("/todos/{id}", response_model=TodoItem)
-def update_task(id: int, updated_task: CreatTodoItemSchema, crud: TaskRepository = Depends(get_crud)):
+def update_task(id: int,
+                updated_task: CreatTodoItemSchema,
+                crud: TaskRepository = Depends(get_crud)) -> TodoItem:
     new_task = crud.update_task(task_id=id, data=updated_task)
     return new_task
 
 @router.patch("/todos/{id}")
-def change_task(id: int, change_data: ChangeSchema, crud: TaskRepository = Depends(get_crud)):
+def change_task(id: int,
+                change_data: ChangeSchema,
+                crud: TaskRepository = Depends(get_crud)) -> TodoItem:
     try:
         new_task = crud.change_task(task_id=id, data=change_data)
         return new_task
@@ -41,7 +45,7 @@ def change_task(id: int, change_data: ChangeSchema, crud: TaskRepository = Depen
 
 
 @router.delete('/todos/{id}')
-def delete_task(id: int, crud: TaskRepository = Depends(get_crud)):
+def delete_task(id: int, crud: TaskRepository = Depends(get_crud)) -> None:
     try:
         crud.delete_task(id)
         return True

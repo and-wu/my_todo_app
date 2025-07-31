@@ -1,14 +1,15 @@
 import sqlite3
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 
 
 class DataBase:
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
         self.path = path
 
     @contextmanager
-    def get_cursor(self):
+    def get_cursor(self) -> Generator[sqlite3.Cursor]:
         conn = sqlite3.connect(self.path)
         cursor = conn.cursor()
         try:
@@ -17,7 +18,7 @@ class DataBase:
         finally:
             conn.close()
 
-    def create_tasks_table(self):
+    def create_tasks_table(self) -> None:
         with self.get_cursor() as cursor:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS tasks (

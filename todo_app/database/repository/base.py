@@ -1,13 +1,12 @@
 from pydantic import BaseModel
 from ..core import DataBase
 
-
 class BaseRepository:
-    def __init__(self, database: DataBase, table: str):
+    def __init__(self, database: DataBase, table: str) -> None:
         self.db = database
         self.table = table
 
-    def create(self, data: BaseModel):
+    def create(self, data: BaseModel) -> int:
         fields = data.model_dump(exclude_unset=True)
         if not fields:
             raise ValueError("Нет данных для создания.")
@@ -24,7 +23,7 @@ class BaseRepository:
             row_id = cursor.lastrowid
             return row_id
 
-    def update(self, row_id: int, data: BaseModel):
+    def update(self, row_id: int, data: BaseModel) -> bool:
         fields = data.model_dump(exclude_unset=True)
         if not fields:
             raise ValueError("Нет данных для обновления.")
@@ -41,7 +40,7 @@ class BaseRepository:
                 raise ValueError(f"Запись с id={row_id} не найдена.")
             return True
 
-    def change(self, row_id: int, data: BaseModel):
+    def change(self, row_id: int, data: BaseModel) -> bool:
         fields = data.model_dump(exclude_unset=True)
         if not fields:
             raise ValueError("Нет данных для обновления.")
@@ -59,13 +58,13 @@ class BaseRepository:
         return True
 
 
-    def delete(self, row_id: int):
+    def delete(self, row_id: int) -> None:
         with self.db.get_cursor() as cursor:
             cursor.execute(f"DELETE FROM {self.table} WHERE id = ?", (row_id,))
             if cursor.rowcount == 0:
                 raise ValueError(f"Запись с id={row_id} не найдена.")
 
-    def get_by_id(self, row_id: int):
+    def get_by_id(self, row_id: int) -> tuple:
         with self.db.get_cursor() as cursor:
             cursor.execute(f"SELECT * FROM {self.table} WHERE id = ?", (row_id,))
             row = cursor.fetchone()
@@ -73,7 +72,7 @@ class BaseRepository:
                 raise ValueError(f"Запись с id={row_id} не найдена.")
             return row
 
-    def get_all(self):
+    def get_all(self) -> list:
         with self.db.get_cursor() as cursor:
             cursor.execute(f"SELECT * FROM {self.table}")
             return cursor.fetchall()

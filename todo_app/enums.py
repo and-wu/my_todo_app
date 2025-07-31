@@ -5,7 +5,7 @@ class Priority(IntEnum):
     MEDIUM = 2
     HIGH = 3
 
-    def __str__(self):
+    def __str__(self) -> str:
         names = {
             Priority.LOW: "низкий",
             Priority.MEDIUM: "средний",
