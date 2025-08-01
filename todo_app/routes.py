@@ -15,29 +15,26 @@ def hello_todo() -> dict:
     }
 
 @router.get('/todos', response_model=list[ReadTodoItemSchema])
-def get_list_tasks(crud: TaskRepository = Depends(get_crud)) -> list[tuple]:
-    return crud.all_tasks()
+async def get_list_tasks(crud: TaskRepository = Depends(get_crud)) -> list[tuple]:
+    return await crud.all_tasks()
 
 @router.post('/todos', response_model=TodoItem)
-def creat_task(task: CreatTodoItemSchema,
+async def creat_task(task: CreatTodoItemSchema,
                crud: TaskRepository = Depends(get_crud)) -> TodoItem:
-    new_task = crud.create_task(task)
-    return new_task
+    return await crud.create_task(task)
 
 @router.put("/todos/{id}", response_model=TodoItem)
-def update_task(id: int,
+async def update_task(id: int,
                 updated_task: CreatTodoItemSchema,
                 crud: TaskRepository = Depends(get_crud)) -> TodoItem:
-    new_task = crud.update_task(task_id=id, data=updated_task)
-    return new_task
+    return await crud.update_task(task_id=id, data=updated_task)
 
 @router.patch("/todos/{id}")
-def change_task(id: int,
+async def change_task(id: int,
                 change_data: ChangeSchema,
                 crud: TaskRepository = Depends(get_crud)) -> TodoItem:
     try:
-        new_task = crud.change_task(task_id=id, data=change_data)
-        return new_task
+        return await crud.change_task(task_id=id, data=change_data)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception:
@@ -45,11 +42,11 @@ def change_task(id: int,
 
 
 @router.delete('/todos/{id}')
-def delete_task(id: int, crud: TaskRepository = Depends(get_crud)) -> None:
+async def delete_task(id: int, crud: TaskRepository = Depends(get_crud)) -> None:
     try:
-        crud.delete_task(id)
+        await crud.delete_task(id)
         return True
-    except HTTPException as e:
-        raise e
+    except HTTPException:
+        raise
     except Exception:
         raise HTTPException(status_code=500, detail="Ошибка при удалении задачи")

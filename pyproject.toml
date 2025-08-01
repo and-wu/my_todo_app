@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
+    "aiosqlite>=0.21.0",
     "fastapi>=0.116.1",
     "ruff>=0.12.7",
     "uvicorn[standart]>=0.35.0",
@@ -23,3 +24,6 @@ lint.select = [
   "E",    # Проверка соответствия PEP8 (ошибки форматирования) — например, отступы, пробелы
   "W",    # Предупреждения по стилю (Warnings) — например, пробел перед скобками, пустые блоки кода и т.п.
 ]
+line-length = 120
+# включаем автоисправление
+#fix = true
