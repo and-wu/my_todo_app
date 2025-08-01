@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -11,11 +12,12 @@ from todo_app.database.core import get_database
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    db = get_database(Path('todos.db'))
-    db.create_tasks_table()
+async def lifespan(app: FastAPI) -> AsyncGenerator:
+    db = get_database(Path("todos.db"))
+    await db.create_tasks_table()
     app.state.crud = TaskRepository(database=db)
     yield
+
 
 app = FastAPI(lifespan=lifespan, title="ToDo API with DB")
 
@@ -32,6 +34,5 @@ app.add_middleware(
 app.include_router(router)
 
 
-
-if __name__ == '__main__':
-    uvicorn.run('main:app', reload=True)
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)

@@ -1,51 +1,52 @@
 from fastapi import APIRouter, HTTPException, Depends
 from starlette.requests import Request
-from typing import List
 
 from todo_app.database.repository.tasks import TaskRepository
-from .models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema
+from .models import TodoItem, CreatTodoItemSchema, ReadTodoItemSchema, ChangeSchema
 router = APIRouter()
 
-def get_crud(request: Request):
+def get_crud(request: Request) -> TaskRepository:
     return request.app.state.crud
 
 @router.get('/')
-def hello_todo():
+def hello_todo() -> dict:
     return {
         'message': 'hello, this is my ToDo with DateBase'
     }
 
-@router.get('/todos', response_model=List[ReadTodoItemSchema])
-def get_list_tasks(crud: TaskRepository = Depends(get_crud)):
-    return crud.all_tasks()
+@router.get('/todos', response_model=list[ReadTodoItemSchema])
+async def get_list_tasks(crud: TaskRepository = Depends(get_crud)) -> list[tuple]:
+    return await crud.all_tasks()
 
 @router.post('/todos', response_model=TodoItem)
-def creat_task(task: CreatTodoItemSchema, crud: TaskRepository = Depends(get_crud)):
-    new_task = crud.create_task(task)
-    return new_task
+async def creat_task(task: CreatTodoItemSchema,
+               crud: TaskRepository = Depends(get_crud)) -> TodoItem:
+    return await crud.create_task(task)
 
 @router.put("/todos/{id}", response_model=TodoItem)
-def update_task(id: int, updated_task: CreatTodoItemSchema, crud: TaskRepository = Depends(get_crud)):
-    new_task = crud.update_task(task_id=id, data=updated_task)
-    return new_task
+async def update_task(id: int,
+                updated_task: CreatTodoItemSchema,
+                crud: TaskRepository = Depends(get_crud)) -> TodoItem:
+    return await crud.update_task(task_id=id, data=updated_task)
 
 @router.patch("/todos/{id}")
-def change_completed(id: int, crud: TaskRepository = Depends(get_crud)):
+async def change_task(id: int,
+                change_data: ChangeSchema,
+                crud: TaskRepository = Depends(get_crud)) -> TodoItem:
     try:
-        new_task = crud.change_completed(id)
-        return new_task
+        return await crud.change_task(task_id=id, data=change_data)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception:
-        raise HTTPException(status_code=500, detail="Ошибка при удалении задачи")
+        raise HTTPException(status_code=500, detail="Ошибка при обновлении задачи")
 
 
 @router.delete('/todos/{id}')
-def delete_task(id: int, crud: TaskRepository = Depends(get_crud)):
+async def delete_task(id: int, crud: TaskRepository = Depends(get_crud)) -> None:
     try:
-        crud.delete_task(id)
+        await crud.delete_task(id)
         return True
-    except HTTPException as e:
-        raise e
+    except HTTPException:
+        raise
     except Exception:
         raise HTTPException(status_code=500, detail="Ошибка при удалении задачи")

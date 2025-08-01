@@ -1,31 +1,34 @@
-import sqlite3
-from contextlib import contextmanager
+import aiosqlite
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 
 class DataBase:
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
         self.path = path
 
-    @contextmanager
-    def get_cursor(self):
-        conn = sqlite3.connect(self.path)
-        cursor = conn.cursor()
+    @asynccontextmanager
+    async def get_cursor(self) -> AsyncGenerator[aiosqlite.Cursor]:
+        conn = await aiosqlite.connect(self.path)
         try:
+            cursor = await conn.cursor()
             yield cursor
-            conn.commit()
+            await conn.commit()
         finally:
-            conn.close()
+            await conn.close()
 
-    def create_tasks_table(self):
-        with self.get_cursor() as cursor:
-            cursor.execute("""
+
+    async def create_tasks_table(self) -> None:
+        async with self.get_cursor() as cursor:
+            await cursor.execute("""
                 CREATE TABLE IF NOT EXISTS tasks (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
                     description TEXT,
                     completed BOOLEAN NOT NULL DEFAULT 0,
-                    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    priority INTEGER NOT NULL DEFAULT 1
                 )
             """)
 
